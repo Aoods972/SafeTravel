@@ -1,0 +1,119 @@
+body {
+  padding: 0;
+  margin: 0;
+  background: #f2f6e9;
+}
+
+
+.navbar {
+  background: #0066FF;
+}
+
+.nav-link,
+.navbar-brand {
+  color: #fff;
+  cursor: pointer;
+}
+
+.nav-link{
+  margin-right: 1em !important;
+}
+
+.nav-link:hover {
+  color: #000;
+}
+
+.navbar-collapse {
+  justify-content: flex-end;
+}
+
+.header {
+  background-color: gray;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.overlay{
+  position: absolute;
+  min-height: 100%;
+  min-width: 100%;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+
+.description{
+  left: 50%;
+  position: absolute;
+  top: 45%;
+  transform: translate(-50%, -55%);
+  text-align: center;
+}
+
+.description h1{
+  color: #0066FF;
+}
+
+.description p{
+  color: #fff;
+  font-size: 1.3rem;
+  line-height: 1.5;
+}
+
+.description button {
+  border:1px solid #0066FF;
+  background:#0066FF;
+  border-radius: 1;
+  color: #fff;
+}
+
+.description button:hover {
+  border:1px solid #fff;
+  background:#fff;
+  color:#000;
+}
+
+.features button {
+  border:1px solid #0066FF;
+  background:#0066FF;
+  border-radius: 1;
+  color: #fff;
+}
+
+.feature-title {
+  color: #0066FF;
+  text-align: center;
+}
+
+.row {
+  position: relative;
+  top: 25px;
+}
+
+table, th, td {
+  color: #fff;
+  text-align: left;
+}
+
+table {
+  border: 3px solid #0066FF;
+  border-radius: 5px !important;
+
+}
+
+#emergency {
+  border:1px solid #FF0000;
+  background:#FF0000;
+  border-radius: 1;
+  color: #fff;
+}
+
+.buttons {
+  list-style-type: none;
+}
+
+.buttons li {
+  margin: 10px 0;
+}
