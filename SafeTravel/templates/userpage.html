@@ -37,13 +37,14 @@
         <div class="row">
           <div class="col-lg-6 col-md-6 col-sm-12">
             <h1 class=feature-title>Create Route</h1>
+            <div id="map" style="height: 600px;"></div>
             <div class="form-group">
               <input type="text" class="form-control" placeholder="Start" name="">
             </div>
             <div class="form-group">
               <input type="text" class="form-control" name="" placeholder="Destination">
             </div>
-            <button class="btn btn-outline-secondary btn-lg">Start Route</button>
+            <button class="btn btn-outline-secondary btn-lg" onclick="getRoute();">Start Route</button>
           </div>
           <div class="col-lg-6 col-md-6 col-sm-12">
               <h1 class="feature-title">Recent Routes</h1>
@@ -82,12 +83,63 @@
       </header>
 
 
+<!--Map Scripts-->
+ <script type = "text/javascript">
+        var map;
+        var lat;
+        var lng;
+        var route;
+        var routeRender;
+        var start;
+        var end;
+        var request;
+
+        function init() {
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: {lat: 0, lng: 0},
+                zoom: 1
+            });
+
+            if (navigator.geolocation){
+                navigator.geolocation.getCurrentPosition(getPosition);
+            } else {
+                alert("Sorry but location does not seem to be enabled!");
+            }
+            
+            route = new google.maps.DirectionService();
+            routeRender = new google.maps.directionRenderer();
+            routeRender.setMap(map);
+        }
+
+        function getPosition(position) {
+            lat = position.coords.latitude;
+            lng = position.coords.longitude;
+
+            map.setCenter({lat, lng});
+            map.setZoom(10);
+        }
+
+        function getRoute() {
+            start = new google.maps.latlng(51.483853, -3.169990);
+            end = google.maps.latlng(51.488298, -3.176767);
+            request = {
+                origin: start,
+                destination: end,
+                travelMode: 'DRIVING'
+            };
+            route.route(request, function(result, status) {
+                if (status == 'OK'){
+                    routeRender.setDirections(result);
+                }
+            });
+        }
+    </script>
+    
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCRWF5gDo4NgCgnRBGo3ueYITwBCCBZAGo&callback=init">
+    </script>
 
 
-
-
-
-
+<!--Basic Scripts-->
     <script src="jquery-3.4.1.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="main.js"></script>
