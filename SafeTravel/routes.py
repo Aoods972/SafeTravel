@@ -25,3 +25,9 @@ def login():
 def signup():
     # Implement signup functionality
     return render_template("signup.html")
+
+
+@app.route("/home", methods=["GET", "POST"])
+def signup():
+    # Implement signup functionality
+    return render_template("userpage.html")
