@@ -27,7 +27,6 @@ def signup():
     return render_template("signup.html")
 
 
-@app.route("/home", methods=["GET", "POST"])
-def signup():
-    # Implement signup functionality
+@app.route("/home")
+def userpage():
     return render_template("userpage.html")
