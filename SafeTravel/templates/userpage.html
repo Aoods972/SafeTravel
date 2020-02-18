@@ -66,7 +66,7 @@
 
     function getRoute() {
         var start = new google.maps.LatLng({lat: 51.483853, lng: -3.169990});
-        var end = new google.maps.LatLng({lat: 51.488298, lng: -3.176767});
+        var end = document.getElementById("destinationInput").value;
         var request = {
             origin: start,
             destination: end,
