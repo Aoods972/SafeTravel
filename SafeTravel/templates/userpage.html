@@ -24,9 +24,6 @@
     var map;
     var route;
     var routeRender;
-    var start;
-    var end;
-    var request;
 
     function init() {
         //Initialise the map
@@ -49,10 +46,14 @@
 
         //Initialise places for input
         var destinationBounds = new google.maps.LatLngBounds(
-            new google.maps.LatLng({lat: 51.551734, lng: -3.288834}),
-            new google.maps.LatLng({lat: 51.446776, lng: -3.056720}));
-        var destinationInput = document.getElementById('destinationInput');
-        autocomplete = new google.maps.places.Autocomplete(destinationInput, {bounds: destinationBounds});
+            new google.maps.LatLng({lat: 51.447116, lng: -3.257797}),
+            new google.maps.LatLng({lat: 51.515633, lng: -3.125522}));
+        var destinationInput = document.getElementById("destinationInput");
+        var options = {
+            bounds: destinationBounds,
+            strictBounds: true
+        }
+        autocomplete = new google.maps.places.Autocomplete(destinationInput, options);
     }
 
     function getPosition(position) {
@@ -66,7 +67,7 @@
     function getRoute() {
         var start = new google.maps.LatLng({lat: 51.483853, lng: -3.169990});
         var end = new google.maps.LatLng({lat: 51.488298, lng: -3.176767});
-        request = {
+        var request = {
             origin: start,
             destination: end,
             travelMode: 'WALKING'
@@ -81,7 +82,7 @@
     }
 </script>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=[API-KEY]&callback=init">
+<script defer async src="https://maps.googleapis.com/maps/api/js?key={{config.GOOGLE}}&callback=init&libraries=places">
 </script>
 
 
