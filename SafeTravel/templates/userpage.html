@@ -9,10 +9,7 @@
         <h1 class=feature-title>Create Route</h1>
         <div id="map" style="height: 600px;"></div>
         <div class="form-group">
-          <input type="text" class="form-control" placeholder="Start" name="">
-        </div>
-        <div class="form-group">
-          <input type="text" class="form-control" name="" placeholder="Destination">
+          <input type="text" class="form-control" id="destinationInput" placeholder="Destination">
         </div>
         <button class="btn btn-outline-secondary btn-lg" onclick="getRoute()">Start Route</button>
       </div>
@@ -32,23 +29,30 @@
     var request;
 
     function init() {
+        //Initialise the map
         map = new google.maps.Map(document.getElementById("map"), {
             center: {lat: 0, lng: 0},
             zoom: 1
         });
 
-        if (navigator.geolocation){
-            
+        //Center map on GPS
+        if (navigator.geolocation){  
             navigator.geolocation.getCurrentPosition(getPosition);
-            
         } else {
             alert("Sorry but location does not seem to be enabled!");
         }
         
+        //Initialise routes services
         route = new google.maps.DirectionsService();
         routeRender = new google.maps.DirectionsRenderer();
         routeRender.setMap(map);
-        getRoute();
+
+        //Initialise places for input
+        var destinationBounds = new google.maps.LatLngBounds(
+            new google.maps.LatLng({lat: 51.551734, lng: -3.288834}),
+            new google.maps.LatLng({lat: 51.446776, lng: -3.056720}));
+        var destinationInput = document.getElementById('destinationInput');
+        autocomplete = new google.maps.places.Autocomplete(destinationInput, {bounds: destinationBounds});
     }
 
     function getPosition(position) {
@@ -71,13 +75,13 @@
             if (status == 'OK') {
                 routeRender.setDirections(result);
             } else {
-                alert("Status is not OK");
+                alert("API key not valid!");
             }
         });
     }
 </script>
 
-<script async defer src="https://maps.googleapis.com/maps/api/js?key={{config.GOOGLE}}&callback=init">
+<script src="https://maps.googleapis.com/maps/api/js?key=[API-KEY]&callback=init">
 </script>
 
 
