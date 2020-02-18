@@ -8,9 +8,7 @@ app = Flask(__name__)
 
 
 # REMOVE THESE 3 VALUES BEFORE PUSHING TO GITHUB
-app.config['SECRET_KEY'] = ""
-app.config["SQLALCHEMY_DATABASE_URI"] = ""
-app.config["GOOGLE"] = ""
+
 
 
 db = SQLAlchemy(app)
