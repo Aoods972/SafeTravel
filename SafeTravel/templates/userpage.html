@@ -1,153 +1,86 @@
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <title>SafeTravel</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="css/bootstrap.css">
-    <link rel="stylesheet" type="text/css" href="style.css">
-  </head>
+{% extends "layout.html" %}
+{% block content %}
 
-
-  <body>
-    <nav class="navbar navbar-expand-md">
-      <a class="navbar-brand" href="#">SafeTravel</a>
-      <button class="navbar-toggler navbar-dark" type="button" data-toggle="collapse" data-target="#main-navigation">
-      <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="main-navigation">
-        <ul class="navbar-nav">
-          <li class="nav-item">
-            <a class="nav-link" href="#">Login</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">About</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Contact Us</a>
-          </li>
-        </ul>
-
+<header class="page-header header container-fluid">
+  <div class="overlay"></div>
+  <div class="container features">
+    <div class="row">
+      <div class="col-lg-6 col-md-6 col-sm-12">
+        <h1 class=feature-title>Create Route</h1>
+        <div id="map" style="height: 600px;"></div>
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Start" name="">
+        </div>
+        <div class="form-group">
+          <input type="text" class="form-control" name="" placeholder="Destination">
+        </div>
+        <button class="btn btn-outline-secondary btn-lg" onclick="getRoute()">Start Route</button>
       </div>
-    </nav>
+    </div>
+    </div>
 
-    <header class="page-header header container-fluid">
-      <div class="overlay"></div>
-      <div class="container features">
-        <div class="row">
-          <div class="col-lg-6 col-md-6 col-sm-12">
-            <h1 class=feature-title>Create Route</h1>
-            <div id="map" style="height: 600px;"></div>
-            <div class="form-group">
-              <input type="text" class="form-control" placeholder="Start" name="">
-            </div>
-            <div class="form-group">
-              <input type="text" class="form-control" name="" placeholder="Destination">
-            </div>
-            <button class="btn btn-outline-secondary btn-lg" onclick="getRoute()">Start Route</button>
-          </div>
-          <div class="col-lg-6 col-md-6 col-sm-12">
-              <h1 class="feature-title">Recent Routes</h1>
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th scope="col">Number</th>
-                    <th scope="col">Start</th>
-                    <th scope="col">End</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">1</th>
-                    <td>CF41 8JK</td>
-                    <td>CF54 87G</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">2</th>
-                    <td>CF53 6HJ</td>
-                    <td>CF52 8KL</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">3</th>
-                    <td>CF42 7DS</td>
-                    <td>CF78 8JK</td>
-                  </tr>
-                </tbody>
-
-              </table>
-          </div>
-
-        </div>
-        </div>
-
-      </header>
+  </header>
 
 
 <!--Map Scripts-->
- <script type = "text/javascript">
-        var map;
-        var route;
-        var routeRender;
-        var start;
-        var end;
-        var request;
+<script type = "text/javascript">
+    var map;
+    var route;
+    var routeRender;
+    var start;
+    var end;
+    var request;
 
-        function init() {
-            map = new google.maps.Map(document.getElementById("map"), {
-                center: {lat: 0, lng: 0},
-                zoom: 1
-            });
+    function init() {
+        map = new google.maps.Map(document.getElementById("map"), {
+            center: {lat: 0, lng: 0},
+            zoom: 1
+        });
 
-            if (navigator.geolocation){
-                
-                navigator.geolocation.getCurrentPosition(getPosition);
-                
-            } else {
-                alert("Sorry but location does not seem to be enabled!");
-            }
+        if (navigator.geolocation){
             
-            route = new google.maps.DirectionsService();
-            routeRender = new google.maps.DirectionsRenderer();
-            routeRender.setMap(map);
-            getRoute();
+            navigator.geolocation.getCurrentPosition(getPosition);
+            
+        } else {
+            alert("Sorry but location does not seem to be enabled!");
         }
+        
+        route = new google.maps.DirectionsService();
+        routeRender = new google.maps.DirectionsRenderer();
+        routeRender.setMap(map);
+        getRoute();
+    }
 
-        function getPosition(position) {
-            var lat = position.coords.latitude;
-            var lng = position.coords.longitude;
+    function getPosition(position) {
+        var lat = position.coords.latitude;
+        var lng = position.coords.longitude;
 
-            map.setCenter({lat, lng});
-            map.setZoom(10);
-        }
+        map.setCenter({lat, lng});
+        map.setZoom(10);
+    }
 
-        function getRoute() {
-            var start = new google.maps.LatLng({lat: 51.483853, lng: -3.169990});
-            var end = new google.maps.LatLng({lat: 51.488298, lng: -3.176767});
-            request = {
-                origin: start,
-                destination: end,
-                travelMode: 'WALKING'
-            };
-            route.route(request, function(result, status) {
-                if (status == 'OK') {
-                    routeRender.setDirections(result);
-                } else {
-                    alert("Status is not OK");
-                }
-            });
-        }
-    </script>
-    
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCRWF5gDo4NgCgnRBGo3ueYITwBCCBZAGo&callback=init">
-    </script>
+    function getRoute() {
+        var start = new google.maps.LatLng({lat: 51.483853, lng: -3.169990});
+        var end = new google.maps.LatLng({lat: 51.488298, lng: -3.176767});
+        request = {
+            origin: start,
+            destination: end,
+            travelMode: 'WALKING'
+        };
+        route.route(request, function(result, status) {
+            if (status == 'OK') {
+                routeRender.setDirections(result);
+            } else {
+                alert("Status is not OK");
+            }
+        });
+    }
+</script>
 
-
-<!--Basic Scripts-->
-    <script src="jquery-3.4.1.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="main.js"></script>
+<!--REMOVE API KEY BEFORE PUSHING TO GITHUB!!!! -->
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=&callback=init">
+</script>
 
 
-  </body>
 
-</html>
+{% endblock content %}
