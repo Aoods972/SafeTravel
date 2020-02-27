@@ -11,7 +11,7 @@
         <div class="form-group">
           <input type="text" class="form-control" id="destinationInput" placeholder="Destination">
         </div>
-        <button class="btn btn-outline-secondary btn-lg" onclick="getRoute()">Start Route</button>
+        <button class="btn btn-outline-secondary btn-lg" onclick="initRoute()">Start Route</button>
       </div>
     </div>
     </div>
@@ -64,9 +64,15 @@
         map.setZoom(10);
     }
 
-    function getRoute() {
-        var start = new google.maps.LatLng({lat: 51.483853, lng: -3.169990});
+    function generateRoute(position) {
+        var lat = position.coords.latitude;
+        var lng = position.coords.longitude;
+
+        var start = new google.maps.LatLng({lat: lat, lng: lng});
         var end = document.getElementById("destinationInput").value;
+
+        alert("Plotting route from:" + lat + ", " + lng);
+
         var request = {
             origin: start,
             destination: end,
@@ -80,11 +86,13 @@
             }
         });
     }
+
+    function initRoute() {
+        navigator.geolocation.getCurrentPosition(generateRoute)
+        
+    }
 </script>
 
 <script defer async src="https://maps.googleapis.com/maps/api/js?key={{config.GOOGLE}}&callback=init&libraries=places">
 </script>
-
-
-
 {% endblock content %}
