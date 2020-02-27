@@ -34,7 +34,7 @@
 
         //Center map on GPS
         if (navigator.geolocation){  
-            navigator.geolocation.getCurrentPosition(getPosition);
+            navigator.geolocation.getCurrentPosition(setMapCenter);
         } else {
             alert("Sorry but location does not seem to be enabled!");
         }
@@ -56,7 +56,7 @@
         autocomplete = new google.maps.places.Autocomplete(destinationInput, options);
     }
 
-    function getPosition(position) {
+    function setMapCenter(position) {
         var lat = position.coords.latitude;
         var lng = position.coords.longitude;
 

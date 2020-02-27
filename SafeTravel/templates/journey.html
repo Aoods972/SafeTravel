@@ -62,16 +62,25 @@
         map.setCenter(pos);
         map.setZoom(18);
 
-        infoWindow.setPosition(pos)
-        infoWindow.setContent("You")
+        infoWindow.setPosition(pos);
+        infoWindow.setContent("You");
         infoWindow.open(map);
 
-        getRoute();
+        navigator.geolocation.getCurrentPosition(generateRoute);
+
+        monitorJourney()
     }
 
 
-    function getRoute() {
-        var end = new google.maps.LatLng({lat: {{lat}}, lng: {{long}}});
+    function generateRoute(position) {
+        var lat = position.coords.latitude;
+        var lng = position.coords.longitude;
+
+        var start = new google.maps.LatLng({lat: lat, lng: lng});
+        var end = document.getElementById("destinationInput").value;
+
+        alert("Plotting route from:" + lat + ", " + lng);
+
         var request = {
             origin: start,
             destination: end,
@@ -84,8 +93,48 @@
                 alert("API key not valid!");
             }
         });
+
     }
 
+    function monitorJourney() {
+        //Initialise sensors for the journey
+
+        //Run the checks
+        while true{
+            monitorAccelerometer();
+            monitorLocation();
+        }
+
+    }
+
+    function monitorAccelerometer() {
+        //Code that checks to trigger the accelerometer response if necessary
+
+    }
+
+    function monitorLocation() {
+        //Code that checks the GPS location to see if the user has stopped, gone off course or arrived
+
+    }
+
+    function respondAccelerometer() {
+        //Code that runs if the accelerometer is triggered
+    }
+
+    function respondOffCourse() {
+        //Code that runs if the user goes off course
+
+    }
+
+    function respondStopped() {
+        //Code that runs if the user stops
+
+    }
+
+    function respondArrived() {
+        //Code that runs if the user arrives at their destination
+
+    }
 </script>
 
 <script defer async src="https://maps.googleapis.com/maps/api/js?key={{config.GOOGLE}}&callback=init&libraries=places">
