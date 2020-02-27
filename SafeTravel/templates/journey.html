@@ -1,0 +1,93 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<br />
+<button class="btn btn-primary btn-lg" onclick="">Move towards destination</button>
+<button class="btn btn-warning btn-lg" onclick="">Deviate</button>
+<button class="btn btn-danger btn-lg" onclick="">S.O.S</button>
+<button class="btn btn-dark btn-lg" onclick="">Exit</button>
+<div id="map" style="width: 80%; height: 80%; position: absolute;">
+</div>
+
+
+<script type="text/javascript">
+    var map;
+    var route;
+    var routeRender;
+    var infoWindow;
+    var start;
+    var userCircle;
+
+    function init(){
+        //Initialise the map
+        map = new google.maps.Map(document.getElementById("map"), {
+            center: {lat: 0, lng: 0},
+            zoom: 1
+        });
+
+        infoWindow = new google.maps.InfoWindow;
+
+        userCircle = new google.maps.Circle({
+            strokeColor: '#FF0000',
+            strokeOpacity: 1,
+            strokeWeight: 2,
+            fillColor: '#FF0000',
+            fillOpacity: 0.4,
+            map: map,
+            center: new google.maps.LatLng(),
+            radius: 20
+        });
+
+        //Center map on GPS
+        if (navigator.geolocation){  
+            navigator.geolocation.getCurrentPosition(getPosition);
+        } else {
+            alert("Sorry but location does not seem to be enabled!");
+        }
+        
+        //Initialise routes services
+        route = new google.maps.DirectionsService();
+        routeRender = new google.maps.DirectionsRenderer();
+        routeRender.setMap(map);
+    }
+
+    function getPosition(position) {
+        var pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+        }
+        
+        start = new google.maps.LatLng(pos);
+        userCircle.center = start;
+        map.setCenter(pos);
+        map.setZoom(18);
+
+        infoWindow.setPosition(pos)
+        infoWindow.setContent("You")
+        infoWindow.open(map);
+
+        getRoute();
+    }
+
+
+    function getRoute() {
+        var end = new google.maps.LatLng({lat: {{lat}}, lng: {{long}}});
+        var request = {
+            origin: start,
+            destination: end,
+            travelMode: 'WALKING'
+        };
+        route.route(request, function(result, status) {
+            if (status == 'OK') {
+                routeRender.setDirections(result);
+            } else {
+                alert("API key not valid!");
+            }
+        });
+    }
+
+</script>
+
+<script defer async src="https://maps.googleapis.com/maps/api/js?key={{config.GOOGLE}}&callback=init&libraries=places">
+</script>
+{% endblock content %}
