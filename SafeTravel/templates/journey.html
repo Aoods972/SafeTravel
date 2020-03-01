@@ -2,13 +2,19 @@
 {% block content %}
 
 <br />
-<button class="btn btn-primary btn-lg" onclick="">Move towards destination</button>
+<button class="btn btn-primary btn-lg" onclick="moveToNextStepClicked()">Move to next step</button>
 <button class="btn btn-warning btn-lg" onclick="">Deviate</button>
 <button class="btn btn-danger btn-lg" onclick="">S.O.S</button>
 <button class="btn btn-dark btn-lg" onclick="">Exit</button>
-<div id="map" style="width: 80%; height: 80%; position: absolute;">
+<div id="map" style="width: 60%; height: 80%; position: absolute; float: left;">
 </div>
 
+<div style="float: right; text-align: center;">
+<h1>Directions</h1>
+<div id="steps">
+</div>
+</div>
+</div>
 
 <script type="text/javascript">
     var map;
@@ -17,6 +23,9 @@
     var infoWindow;
     var start;
     var userCircle;
+    var wayPoints = [];
+    var currentWayPointIndex = 0;
+    var directions = [];
 
     function init(){
         //Initialise the map
@@ -88,6 +97,28 @@
         route.route(request, function(result, status) {
             if (status == 'OK') {
                 routeRender.setDirections(result);
+
+                let steps = result.routes[0].legs[0].steps;
+                console.log(result);
+                var counter = 0;
+
+                steps.forEach(step => {
+                    wayPoints.push(step.end_location);
+
+                    let instruction = step.instructions;
+                    let distance = step.distance.text;
+                    var text = "Instruction: " + instruction + "\nDistance: " + distance;
+                    directions.push(text);
+
+                    if (counter == 0){
+                        counter += 1;
+                        text = "<mark style='background-color: red'>Instruction: " + text + "</mark>";
+                    }
+                    text += "<br />"
+
+                    document.getElementById("steps").innerHTML += text;
+                });
+
             } else {
                 console.log("API key not valid!");
             }
@@ -103,7 +134,35 @@
             monitorLocation();
             break;
         }
+    }
 
+    function moveToNextStepClicked(){
+        
+        if (currentWayPointIndex < wayPoints.length){
+            let wayPoint = wayPoints[currentWayPointIndex];
+            let lat = wayPoint.lat();
+            let long = wayPoint.lng();
+            let pos = {lat: lat, lng: long};
+            userCircle.setCenter(new google.maps.LatLng(pos));
+
+            infoWindow.setPosition(pos);
+
+            var innerHTMLArray = document.getElementById("steps").innerHTML.split("<br>")
+            innerHTMLArray[currentWayPointIndex] = directions[currentWayPointIndex]
+
+            if (currentWayPointIndex + 1 < wayPoints.length){
+                innerHTMLArray[currentWayPointIndex + 1] = "<mark style='background-color: red'>Instruction: " + directions[currentWayPointIndex + 1] + "</mark>";
+            }
+
+            console.log(innerHTMLArray.join(""));
+            document.getElementById("steps").innerHTML = innerHTMLArray.join("<br />");
+        }
+
+        currentWayPointIndex += 1;
+
+        if (currentWayPointIndex == wayPoints.length){
+            alert("You have reached your destination!");
+        }
     }
 
     function monitorAccelerometer() {

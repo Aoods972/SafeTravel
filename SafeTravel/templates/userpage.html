@@ -7,7 +7,11 @@
 <div style="width: 80%; margin: 0 auto; display: block; padding-bottom: 20px;" class="form-group">
     <input type="text" class="form-control" id="destinationInput" placeholder="Destination">
 </div>
-<button id="startButton" style="margin: 0 auto; display: block" class="btn btn-primary btn-lg" onclick="startButtonClicked()">Start Route</button>
+
+<button id="startButton" class="btn btn-primary btn-lg" onclick="initRoute()">Start Route</button>
+<button id="startJourneyButton" class="btn btn-danger btn-lg" style="visibility: hidden;" onclick="startJourney()">Start Journey</button>
+
+
 <br />
 <div id="map" style="width: 100%; position: absolute; height: 70%;"></div>
 
@@ -97,7 +101,7 @@
         route.route(request, function(result, status) {
             if (status == 'OK') {
                 routeRender.setDirections(result);
-                document.getElementById("startButton").innerHTML = "Start Journey";
+                document.getElementById("startJourneyButton").style = "visibility: visible";
                 let destinationPlaceID = result.geocoded_waypoints[result.geocoded_waypoints.length - 1].place_id;
                 let geocoder = new google.maps.Geocoder;
 
@@ -116,18 +120,12 @@
         });
     }
 
-    function startButtonClicked(){
-       let buttonValue = document.getElementById("startButton").innerHTML;
-       if (buttonValue == "Start Route"){
-           // Find directions
-           initRoute();
-       }else{
-           // Start journey
-           location.href = "/journey/lat=" + journeyEndLat + ",long=" + journeyEndLong
-       }
-    }
     function initRoute() {
         navigator.geolocation.getCurrentPosition(generateRoute)
+    }
+
+    function startJourney() {
+        location.href = "/journey/lat=" + journeyEndLat + ",long=" + journeyEndLong
     }
 
 </script>
