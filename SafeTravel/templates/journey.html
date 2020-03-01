@@ -60,7 +60,7 @@
         start = new google.maps.LatLng(pos);
         userCircle.center = start;
         map.setCenter(pos);
-        map.setZoom(18);
+        map.setZoom(16);
 
         infoWindow.setPosition(pos);
         infoWindow.setContent("You");
@@ -77,9 +77,8 @@
         var lng = position.coords.longitude;
 
         var start = new google.maps.LatLng({lat: lat, lng: lng});
-        var end = document.getElementById("destinationInput").value;
-
-        alert("Plotting route from:" + lat + ", " + lng);
+        // Using coordinates from URL parameters
+        var end = new google.maps.LatLng({lat: {{lat}}, lng: {{long}}});
 
         var request = {
             origin: start,
@@ -90,19 +89,19 @@
             if (status == 'OK') {
                 routeRender.setDirections(result);
             } else {
-                alert("API key not valid!");
+                console.log("API key not valid!");
             }
         });
-
     }
 
     function monitorJourney() {
         //Initialise sensors for the journey
 
         //Run the checks
-        while true{
+        while (true) {
             monitorAccelerometer();
             monitorLocation();
+            break;
         }
 
     }

@@ -55,17 +55,17 @@ def signup():
 
 @app.route("/userPage")
 def userPage():
-	if current_user.is_authenticated:
-		return render_template("userpage.html")
+    if current_user.is_authenticated:
+        return render_template("userpage.html")
+        
+    return render_template("index.html")
 
-	return render_template("index.html")
-
-@app.route("/journey")
-def journey():
-	if current_user.is_authenticated:
-		return render_template("journey.html", lat=51.4859256, long=-3.1929228)
-
-	return render_template("index.html")
+@app.route("/journey/lat=<string:lat>,long=<string:long>")
+def journey(lat, long):
+    if current_user.is_authenticated:
+        return render_template("journey.html", lat=float(lat), long=float(long))
+        
+    return render_template("index.html")
 
 @app.route("/signout")
 def signout():

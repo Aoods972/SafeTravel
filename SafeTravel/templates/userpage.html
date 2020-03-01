@@ -1,35 +1,45 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<header class="page-header header container-fluid">
-  <div class="overlay"></div>
-  <div class="container features">
-    <div class="row">
-      <div class="col-lg-6 col-md-6 col-sm-12">
-        <h1 class=feature-title>Create Route</h1>
-        <div id="map" style="height: 600px;"></div>
-        <div class="form-group">
-          <input type="text" class="form-control" id="destinationInput" placeholder="Destination">
-        </div>
-        <button class="btn btn-outline-secondary btn-lg" onclick="initRoute()">Start Route</button>
-      </div>
-    </div>
-    </div>
-
-  </header>
-
+<br />
+<h1 class=feature-title>Create Journey</h1>
+<br />
+<div style="width: 80%; margin: 0 auto; display: block; padding-bottom: 20px;" class="form-group">
+    <input type="text" class="form-control" id="destinationInput" placeholder="Destination">
+</div>
+<button id="startButton" style="margin: 0 auto; display: block" class="btn btn-primary btn-lg" onclick="startButtonClicked()">Start Route</button>
+<br />
+<div id="map" style="width: 100%; position: absolute; height: 70%;"></div>
 
 <!--Map Scripts-->
 <script type = "text/javascript">
     var map;
     var route;
     var routeRender;
+    var infoWindow;
+    var start;
+    var userCircle;
+    var journeyEndLat;
+    var journeyEndLong;
 
     function init() {
         //Initialise the map
         map = new google.maps.Map(document.getElementById("map"), {
             center: {lat: 0, lng: 0},
             zoom: 1
+        });
+
+        infoWindow = new google.maps.InfoWindow;
+
+        userCircle = new google.maps.Circle({
+            strokeColor: '#FF0000',
+            strokeOpacity: 1,
+            strokeWeight: 2,
+            fillColor: '#FF0000',
+            fillOpacity: 0.4,
+            map: map,
+            center: new google.maps.LatLng(),
+            radius: 20
         });
 
         //Center map on GPS
@@ -57,11 +67,19 @@
     }
 
     function setMapCenter(position) {
-        var lat = position.coords.latitude;
-        var lng = position.coords.longitude;
+        var pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+        }
+        
+        start = new google.maps.LatLng(pos);
+        userCircle.center = start;
+        map.setCenter(pos);
+        map.setZoom(15);
 
-        map.setCenter({lat, lng});
-        map.setZoom(10);
+        infoWindow.setPosition(pos);
+        infoWindow.setContent("You");
+        infoWindow.open(map);
     }
 
     function generateRoute(position) {
@@ -71,8 +89,6 @@
         var start = new google.maps.LatLng({lat: lat, lng: lng});
         var end = document.getElementById("destinationInput").value;
 
-        alert("Plotting route from:" + lat + ", " + lng);
-
         var request = {
             origin: start,
             destination: end,
@@ -81,18 +97,43 @@
         route.route(request, function(result, status) {
             if (status == 'OK') {
                 routeRender.setDirections(result);
+                document.getElementById("startButton").innerHTML = "Start Journey";
+                let destinationPlaceID = result.geocoded_waypoints[result.geocoded_waypoints.length - 1].place_id;
+                let geocoder = new google.maps.Geocoder;
+
+                geocoder.geocode({'placeId': destinationPlaceID}, function(results, status) {
+                    if (status != "OK"){
+                        console.log("geocoder failed due to " + status);
+                        return;
+                    }
+                    
+                    journeyEndLat = results[0].geometry.location.lat();
+                    journeyEndLong = results[0].geometry.location.lng();
+                });
             } else {
-                alert("API key not valid!");
+                console.log("API key not valid!");
             }
         });
     }
 
+    function startButtonClicked(){
+       let buttonValue = document.getElementById("startButton").innerHTML;
+       if (buttonValue == "Start Route"){
+           // Find directions
+           initRoute();
+       }else{
+           // Start journey
+           location.href = "/journey/lat=" + journeyEndLat + ",long=" + journeyEndLong
+       }
+    }
     function initRoute() {
         navigator.geolocation.getCurrentPosition(generateRoute)
-        
     }
+
 </script>
 
 <script defer async src="https://maps.googleapis.com/maps/api/js?key={{config.GOOGLE}}&callback=init&libraries=places">
 </script>
+
+
 {% endblock content %}
