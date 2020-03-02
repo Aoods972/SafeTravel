@@ -1,11 +1,34 @@
 {% extends "layout.html" %}
 {% block content %}
 
+  
+  <!-- Modal -->
+  <div class="modal fade" id="confirmEmergencyModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">You have deviated!</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          Are you all right? You went off course!<br />
+          If you don't respond in <span id="countdowntimer">10 </span> seconds, emergency will be confirmed!
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="modalSOSClicked()">S.O.S</button>
+          <button type="button" class="btn btn-primary" data-dismiss="modal">I am OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 <br />
 <button class="btn btn-primary btn-lg" onclick="moveToNextStepClicked()">Move to next step</button>
-<button class="btn btn-warning btn-lg" onclick="">Deviate</button>
-<button class="btn btn-danger btn-lg" onclick="">S.O.S</button>
-<button class="btn btn-dark btn-lg" onclick="">Exit</button>
+<button class="btn btn-warning btn-lg" onclick="respondOffCourse()">Deviate</button>
+<button class="btn btn-danger btn-lg" onclick="emergencyActivated()">S.O.S</button>
+<button class="btn btn-dark btn-lg" onclick="userExitClicked()">Exit</button>
 <div id="map" style="width: 60%; height: 80%; position: absolute; float: left;">
 </div>
 
@@ -161,7 +184,7 @@
         currentWayPointIndex += 1;
 
         if (currentWayPointIndex == wayPoints.length){
-            alert("You have reached your destination!");
+            respondArrived();
         }
     }
 
@@ -179,20 +202,64 @@
         //Code that runs if the accelerometer is triggered
     }
 
+    var countdown;
+
     function respondOffCourse() {
         //Code that runs if the user goes off course
+        clearInterval(countdown);
+        document.getElementById("countdowntimer").textContent = 10;
+        emergencyConfirmed = false;
+        
+        $("#confirmEmergencyModal").modal('show');
+        var seconds = 10;
 
+        countdown = setInterval(function() {
+            seconds--;
+            document.getElementById("countdowntimer").textContent = seconds;
+            if (seconds == 0){
+                clearInterval(countdown);
+                $("#confirmEmergencyModal").modal('hide');
+                emergencyConfirmed = true;
+            }
+        }, 1000);
+    }
+
+    $('#confirmEmergencyModal').on('hidden.bs.modal', function (e) {
+        clearInterval(countdown);
+        if (emergencyConfirmed){
+            emergencyActivated();
+        }
+    })
+
+    var emergencyConfirmed = false;
+    function emergencyActivated(){
+        alert("got ya");
+    }
+
+    function modalSOSClicked(){
+        $("#confirmEmergencyModal").modal('hide');
+        emergencyConfirmed = true;
     }
 
     function respondStopped() {
         //Code that runs if the user stops
-
     }
 
     function respondArrived() {
         //Code that runs if the user arrives at their destination
+        alert("You have reached your destination!");
+        location.href = "/userPage";
+    }
+
+    function userExitClicked(){
+        var txt;
+        var r = confirm("Are you sure you want to exit?");
+        if (r == true) {
+            location.href = "/userPage";
+        }
 
     }
+
 </script>
 
 <script defer async src="https://maps.googleapis.com/maps/api/js?key={{config.GOOGLE}}&callback=init&libraries=places">
