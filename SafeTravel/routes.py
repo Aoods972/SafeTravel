@@ -2,7 +2,9 @@ from flask import render_template, url_for, flash, redirect, request
 from SafeTravel.forms import SignUpForm, LoginForm
 from SafeTravel import app, db, bcrypt
 from flask_login import login_user, current_user, logout_user, login_required
-from SafeTravel.models import User
+from SafeTravel.models import User, Emergency
+from twilio.rest import Client
+import datetime
 
 @app.route("/")
 def home():
@@ -71,3 +73,49 @@ def journey(lat, long):
 def signout():
     logout_user()
     return redirect(url_for("home"))
+
+@app.route("/emergencyStart", methods = ["POST"])
+def startEmergency():
+    print("emergency started...")
+    userLat = request.form.get("userLat")
+    userLong = request.form.get("userLong")
+    user = current_user;
+
+    #record in database
+    time = datetime.datetime.now()
+    emergency = Emergency(userID=user.id,time=time,lat=userLat,lng=userLong)
+    db.session.add(emergency)
+    db.session.commit()
+
+    #send sms
+    client = Client(app.config["TWILLIO_SID"], app.config["AUTH_TOKEN"])
+    client.messages \
+                .create(
+                     body= "EMERGENCY(#" + str(emergency.id) + "): " + user.name + " is in danger!\n\n" + "https://www.google.com/maps/place/" + userLat + "," + userLong,
+                     from_='+441618508564',
+                     to='+447763549293‬'
+                 )
+
+
+    return str(emergency.id)
+
+@app.route("/emergencyCancel", methods = ["POST"])
+def cancelEmergency():
+    print("emergency cancelled");
+    emergencyID = request.form.get("emergencyID")
+    user = current_user;
+
+    #remove from database
+    Emergency.query.filter(Emergency.id == emergencyID).delete()
+    db.session.commit()
+
+    #send sms
+    client = Client(app.config["TWILLIO_SID"], app.config["AUTH_TOKEN"])
+    client.messages \
+                .create(
+                     body= "EMERGENCY CANCELLED(#" + emergencyID + "): " + user.name + " is SAFE!",
+                     from_='+441618508564',
+                     to='+447763549293‬'
+                 )
+
+    return "OK"

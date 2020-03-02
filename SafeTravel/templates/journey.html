@@ -2,7 +2,7 @@
 {% block content %}
 
   
-  <!-- Modal -->
+  <!-- Confirm Modal -->
   <div class="modal fade" id="confirmEmergencyModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -17,8 +17,26 @@
           If you don't respond in <span id="countdowntimer">10 </span> seconds, emergency will be confirmed!
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="modalSOSClicked()">S.O.S</button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="emergencyActivated()">S.O.S</button>
           <button type="button" class="btn btn-primary" data-dismiss="modal">I am OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S.O.S Modal -->
+  <div class="modal fade" id="sosModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">S.O.S Confirmed!</h5>
+          </button>
+        </div>
+        <div class="modal-body">
+          Police has been notified and an officer is on the way to you, don't worry!
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="cancelEmergency()">Cancel Emergency</button>
         </div>
       </div>
     </div>
@@ -122,7 +140,7 @@
                 routeRender.setDirections(result);
 
                 let steps = result.routes[0].legs[0].steps;
-                console.log(result);
+                
                 var counter = 0;
 
                 steps.forEach(step => {
@@ -177,7 +195,7 @@
                 innerHTMLArray[currentWayPointIndex + 1] = "<mark style='background-color: red'>Instruction: " + directions[currentWayPointIndex + 1] + "</mark>";
             }
 
-            console.log(innerHTMLArray.join(""));
+            
             document.getElementById("steps").innerHTML = innerHTMLArray.join("<br />");
         }
 
@@ -232,8 +250,20 @@
     })
 
     var emergencyConfirmed = false;
+    var emergencySentID;
     function emergencyActivated(){
-        alert("got ya");
+        $("#sosModal").modal('show');
+        let lat = userCircle.center.lat();
+        let long = userCircle.center.lng();
+
+        $.ajax({
+            type: "POST",
+            url: "/emergencyStart",
+            data: { userLat: lat, userLong: long },
+            success: function(response) {
+                emergencySentID = response;
+            }
+        });
     }
 
     function modalSOSClicked(){
@@ -258,6 +288,14 @@
             location.href = "/userPage";
         }
 
+    }
+
+    function cancelEmergency(){
+        $.ajax({
+            type: "POST",
+            url: "/emergencyCancel",
+            data: { emergencyID: emergencySentID }
+        });
     }
 
 </script>
