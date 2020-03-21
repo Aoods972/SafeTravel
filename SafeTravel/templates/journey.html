@@ -68,6 +68,10 @@
     var wayPoints = [];
     var currentWayPointIndex = 0;
     var directions = [];
+    //Create Variables for the 3 most recent positions
+    var pos1 = {lat: null, lng: null};
+    var pos2 = {lat: null, lng: null};
+    var pos3 = {lat: null, lng: null};
 
     function init(){
         //Initialise the map
@@ -119,7 +123,7 @@
 
         navigator.geolocation.getCurrentPosition(generateRoute);
 
-        monitorJourney()
+        //monitorJourney()
     }
 
 
@@ -167,19 +171,18 @@
         });
     }
 
-    function monitorJourney() {
-        //Initialise sensors for the journey
+        function monitorJourney() {
+            //Initialise sensors for the journey
 
-        //Run the checks
-        while (true) {
-            monitorAccelerometer();
-            monitorLocation();
-            break;
-        }
+            //Run the checks
+            while (true) {
+                monitorAccelerometer();
+                navigator.geolocation.getCurrentPosition(monitorLocation)
+                break;
+            }
     }
 
     function moveToNextStepClicked(){
-        
         if (currentWayPointIndex < wayPoints.length){
             let wayPoint = wayPoints[currentWayPointIndex];
             let lat = wayPoint.lat();
@@ -220,9 +223,33 @@
 
     }
 
-    function monitorLocation() {
+    function monitorLocation(position) {
         //Code that checks the GPS location to see if the user has stopped, gone off course or arrived
+        
+        //First update the most recent positions
+        pos3 = pos2;
+        pos2 = pos1;
+        pos1 = {lat: position.coords.latitude, lng: position.coords.longitude};
 
+        //Check to see if the user has stopped (if the 3 last locations are all within Xm of each other)
+        //Calculate the difference in latitude between pos1, pos2 and pos3
+        var latDif12 = Math.abs(pos1.lat - pos2.lat);
+        var latDif13 = Math.abs(pos1.lat - pos3.lat);
+        var latDif23 = Math.abs(pos2.lat - pos3.lat);
+
+        //Calculate the difference in longistude between pos1, pos2 and pos3
+        var lngDif12 = Math.abs(pos1.lng - pos2.lng);
+        var lngDif13 = Math.abs(pos1.lng - pos3.lng);
+        var lngDif23 = Math.abs(pos2.lng - pos3.lng);
+
+        //Set the threshold for what counts as the same location
+        var threshold = 0.0003;
+
+        //Run the check
+        if (lngDif12 < threshold && lngDif13 < threshold && lngDif23 < threshold && lngDif12 < threshold && lngDif13 < threshold && lngDif23 < threshold){
+            console.log("User has stopped!");
+            respondOffCourse();
+        }
     }
 
     function respondAccelerometer() {
