@@ -56,6 +56,17 @@
         </ul>
       </div>
     </nav>
+      <p id="battery"></p>
+
+      <script type="text/javascript">
+
+      var percent = navigator.getBattery().then(function(battery){
+          //document.write(battery.level*100);
+      });
+
+    
+
+
 
             {% block content %}
             
